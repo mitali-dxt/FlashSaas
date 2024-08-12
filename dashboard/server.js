@@ -21,8 +21,6 @@ connection.connect(err => {
 });
 
 // Routes
-
-// Get all categories
 app.get('/categories', (req, res) => {
     connection.query('SELECT * FROM categories', (err, results) => {
         if (err) throw err;
@@ -30,7 +28,6 @@ app.get('/categories', (req, res) => {
     });
 });
 
-// Add a new category
 app.post('/categories', (req, res) => {
     const { name } = req.body;
     connection.query('INSERT INTO categories (name) VALUES (?)', [name], (err, results) => {
@@ -39,7 +36,6 @@ app.post('/categories', (req, res) => {
     });
 });
 
-// Get all flashcards
 app.get('/flashcards', (req, res) => {
     connection.query('SELECT * FROM flashcards', (err, results) => {
         if (err) throw err;
@@ -47,7 +43,6 @@ app.get('/flashcards', (req, res) => {
     });
 });
 
-// Get flashcards by category
 app.get('/flashcards/:categoryId', (req, res) => {
     const { categoryId } = req.params;
     connection.query('SELECT * FROM flashcards WHERE category_id = ?', [categoryId], (err, results) => {
@@ -56,7 +51,6 @@ app.get('/flashcards/:categoryId', (req, res) => {
     });
 });
 
-// Add a new flashcard
 app.post('/flashcards', (req, res) => {
     const { question, answer, category_id } = req.body;
     connection.query('INSERT INTO flashcards (question, answer, category_id) VALUES (?, ?, ?)', [question, answer, category_id], (err, results) => {
@@ -65,7 +59,6 @@ app.post('/flashcards', (req, res) => {
     });
 });
 
-// Update a flashcard
 app.put('/flashcards/:id', (req, res) => {
     const { id } = req.params;
     const { question, answer, category_id } = req.body;
@@ -75,7 +68,6 @@ app.put('/flashcards/:id', (req, res) => {
     });
 });
 
-// Delete a flashcard
 app.delete('/flashcards/:id', (req, res) => {
     const { id } = req.params;
     connection.query('DELETE FROM flashcards WHERE id = ?', [id], (err) => {
@@ -84,7 +76,8 @@ app.delete('/flashcards/:id', (req, res) => {
     });
 });
 
-const port = 5000;
+// Use the PORT environment variable or default to 5000
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });

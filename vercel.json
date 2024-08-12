@@ -1,0 +1,38 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "frontend/app.js",
+        "use": "@vercel/node",
+        "config": {
+          "maxLambdaSize": "50mb"
+        }
+      },
+      {
+        "src": "dashboard/server.js",
+        "use": "@vercel/node",
+        "config": {
+          "maxLambdaSize": "50mb"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/frontend/app.js"
+      },
+      {
+        "src": "/categories",
+        "dest": "/dashboard/server.js"
+      },
+      {
+        "src": "/flashcards",
+        "dest": "/dashboard/server.js"
+      },
+      {
+        "src": "/flashcards/(.*)",
+        "dest": "/dashboard/server.js"
+      }
+    ]
+  }
+  
