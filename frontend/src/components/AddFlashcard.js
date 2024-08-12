@@ -10,7 +10,7 @@ const AddFlashcard = ({ fetchFlashcards, categories }) => {
   const handleAddFlashcard = async () => {
     if (question && answer && selectedCategory) {
       try {
-        await axios.post('http://localhost:5000/flashcards', {
+        await axios.post('https://flash-server-beta.vercel.app/flashcards', {
           question,
           answer,
           category_id: selectedCategory

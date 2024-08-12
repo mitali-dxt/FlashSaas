@@ -24,7 +24,7 @@ const Dashboard = () => {
 
   const fetchFlashcards = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/flashcards');
+      const response = await axios.get('https://flash-server-beta.vercel.app/flashcards');
       setFlashcards(response.data);
     } catch (error) {
       console.error('Error fetching flashcards:', error.message);
@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/categories');
+      const response = await axios.get('https://flash-server-beta.vercel.app/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error.message);
@@ -42,7 +42,7 @@ const Dashboard = () => {
 
   const handleDeleteFlashcard = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/flashcards/${id}`);
+      await axios.delete(`https://flash-server-beta.vercel.app/flashcards/${id}`);
       fetchFlashcards(); // Refresh the list after deletion
     } catch (error) {
       console.error('Error deleting flashcard:', error.message);
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   const handleEditFlashcard = async () => {
     try {
-      await axios.put(`http://localhost:5000/flashcards/${editId}`, {
+      await axios.put(`https://flash-server-beta.vercel.app/flashcards/${editId}`, {
         question,
         answer,
         category_id: originalCategoryId,

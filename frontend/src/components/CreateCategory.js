@@ -12,7 +12,7 @@ const CreateCategory = ({ fetchCategories }) => {
       setLoading(true);
       setMessage('');
       try {
-        await axios.post('http://localhost:5000/categories', { name: newCategory });
+        await axios.post('https://flash-server-beta.vercel.app/categories', { name: newCategory });
         fetchCategories();
         setNewCategory('');
         setMessage('Category added successfully!');

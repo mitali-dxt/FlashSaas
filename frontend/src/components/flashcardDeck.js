@@ -22,7 +22,7 @@ const FlashcardDeck = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/categories');
+      const response = await axios.get('https://flash-server-beta.vercel.app/categories');
       setCategories(response.data);
       if (response.data.length > 0) {
         setSelectedCategory(response.data[0].id); // Auto-select the first category
@@ -34,7 +34,7 @@ const FlashcardDeck = () => {
 
   const fetchFlashcards = async (categoryId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/flashcards?category=${categoryId}`);
+      const response = await axios.get(`https://flash-server-beta.vercel.app/flashcards?category=${categoryId}`);
       setFlashcards(response.data);
       setCurrentIndex(0); // Reset to the first flashcard when category changes
     } catch (error) {
