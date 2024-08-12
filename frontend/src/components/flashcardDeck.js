@@ -1,21 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Flex, IconButton } from '@chakra-ui/react';
+import { Box, Flex, IconButton, Text, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import Flashcard from './flashcard';
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
-import axios from 'axios'; 
+import axios from 'axios';
 
 const FlashcardDeck = () => {
   const [flashcards, setFlashcards] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
-    fetchFlashcards();
+    fetchCategories();
   }, []);
 
-  const fetchFlashcards = async () => {
+  useEffect(() => {
+    if (selectedCategory) {
+      fetchFlashcards(selectedCategory);
+    }
+  }, [selectedCategory]);
+
+  const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/flashcards');
+      const response = await axios.get('http://localhost:5000/categories');
+      setCategories(response.data);
+      if (response.data.length > 0) {
+        setSelectedCategory(response.data[0].id); // Auto-select the first category
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const fetchFlashcards = async (categoryId) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/flashcards?category=${categoryId}`);
       setFlashcards(response.data);
+      setCurrentIndex(0); // Reset to the first flashcard when category changes
     } catch (error) {
       console.error('Error fetching flashcards:', error);
     }
@@ -61,48 +82,78 @@ const FlashcardDeck = () => {
         position="relative"
         zIndex="1" // Ensure this is above the gradient circle
       >
-        <Flex align="center" position="relative">
-          <IconButton
-            aria-label="Previous"
-            icon={<ArrowBackIcon boxSize={8}/>}
-            onClick={prevCard}
-            position="absolute"
-            left="16px" // Adjusted position
-            top="50%"
-            transform="translateY(-50%)"
-            zIndex="2"
-            borderRadius="full"
-            color="black"
-            background="transparent"
-            _hover={{ background: "transparent" }}
-            _active={{ background: "transparent" }}
-            _focus={{ boxShadow: "none" }}
-          />
-          <Box>
-            {flashcards.length > 0 && (
-              <Flashcard
-                question={flashcards[currentIndex].question}
-                answer={flashcards[currentIndex].answer}
-              />
-            )}
-          </Box>
-          <IconButton
-            aria-label="Next"
-            icon={<ArrowForwardIcon boxSize={8} />}
-            onClick={nextCard}
-            position="absolute"
-            right="16px" // Adjusted position
-            top="50%"
-            transform="translateY(-50%)"
-            zIndex="2"
-            borderRadius="full"
-            color="black"
-            background="transparent"
-            _hover={{ background: "transparent" }}
-            _active={{ background: "transparent" }}
-            _focus={{ boxShadow: "none" }}
-          />
-        </Flex>
+        <Text fontSize="3xl" color="white" mb={4} mt={20} fontWeight="bold">What do you want to study?</Text>
+        <Tabs
+          isFitted
+          variant="soft-rounded"
+          colorScheme="red"
+          mt={10}
+          mb={6}
+          onChange={(index) => {
+            const categoryId = categories[index]?.id;
+            if (categoryId) {
+              setSelectedCategory(categoryId);
+            }
+          }}
+        >
+          <TabList>
+            {categories.map((category) => (
+              <Tab key={category.id} _selected={{ color: 'pink.400', borderColor: 'pink.400' }} color="white">
+                {category.name}
+              </Tab>
+            ))}
+          </TabList>
+          <TabPanels>
+            {categories.map((category) => (
+              <TabPanel key={category.id}>
+                {flashcards.length > 0 && (
+                  <Flex direction="column" align="center" justify="center" position="relative">
+                    <Flex align="center" position="relative">
+                      <IconButton
+                        aria-label="Previous"
+                        icon={<ArrowBackIcon boxSize={8}/>}
+                        onClick={prevCard}
+                        position="absolute"
+                        left="16px"
+                        top="50%"
+                        transform="translateY(-50%)"
+                        zIndex="2"
+                        borderRadius="full"
+                        color="black"
+                        background="transparent"
+                        _hover={{ background: "transparent" }}
+                        _active={{ background: "transparent" }}
+                        _focus={{ boxShadow: "none" }}
+                      />
+                      <Box>
+                        <Flashcard
+                          question={flashcards[currentIndex].question}
+                          answer={flashcards[currentIndex].answer}
+                        />
+                      </Box>
+                      <IconButton
+                        aria-label="Next"
+                        icon={<ArrowForwardIcon boxSize={8} />}
+                        onClick={nextCard}
+                        position="absolute"
+                        right="16px"
+                        top="50%"
+                        transform="translateY(-50%)"
+                        zIndex="2"
+                        borderRadius="full"
+                        color="black"
+                        background="transparent"
+                        _hover={{ background: "transparent" }}
+                        _active={{ background: "transparent" }}
+                        _focus={{ boxShadow: "none" }}
+                      />
+                    </Flex>
+                  </Flex>
+                )}
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
       </Flex>
     </Box>
   );

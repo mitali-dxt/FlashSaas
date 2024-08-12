@@ -9,10 +9,10 @@ app.use(bodyParser.json());
 
 // MySQL connection
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Mitali1412#', // Change this to your MySQL root password
-    database: 'flashcards_db'
+    host: 'sql12.freesqldatabase.com',
+    user: 'sql12725570',
+    password: 'vDYdxDaRJk',
+    database: 'sql12725570',
 });
 
 connection.connect(err => {

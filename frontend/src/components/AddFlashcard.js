@@ -28,36 +28,13 @@ const AddFlashcard = ({ fetchFlashcards, categories }) => {
   return (
     <Box mb={8}>
       <Stack spacing={4}>
-        <Input 
-          placeholder="Question"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          width="500px" // Adjusted width
-          height="60px" // Increased height
-          bg="transparent" // Transparent background
-          color="white" // White text color
-          borderRadius="md"
-          border="1px solid rgba(255, 255, 255, 0.2)"
-        />
-        <Input 
-          placeholder="Answer"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          width="500px" // Adjusted width
-          height="120px" // Increased height
-          bg="transparent" // Transparent background
-          color="white" // White text color
-          borderRadius="md"
-          border="1px solid rgba(255, 255, 255, 0.2)"
-          resize="none"
-        />
-        <Select
+      <Select
           placeholder="Select category"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          width="500px" // Adjusted width
-          bg="transparent" // Transparent background
-          color="white" // White text color
+          width="500px"
+          bg="rgba(0, 0, 0, 0.3)" // Adjusted for better visibility
+          color="white"
           borderRadius="md"
           border="1px solid rgba(255, 255, 255, 0.2)"
         >
@@ -67,6 +44,30 @@ const AddFlashcard = ({ fetchFlashcards, categories }) => {
             </option>
           ))}
         </Select>
+        <Input 
+          placeholder="Question"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          width="500px"
+          height="60px"
+          bg="transparent"
+          color="white"
+          borderRadius="md"
+          border="1px solid rgba(255, 255, 255, 0.2)"
+        />
+        <Input 
+          placeholder="Answer"
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          width="500px"
+          height="120px"
+          bg="transparent"
+          color="white"
+          borderRadius="md"
+          border="1px solid rgba(255, 255, 255, 0.2)"
+          resize="none"
+        />
+        
         <Button
           bg="rgb(190, 18, 60)"
           color="white"

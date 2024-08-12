@@ -6,8 +6,8 @@ const Flashcard = ({ question, answer }) => {
 
   return (
     <Box
-      width="600px" // Increased width
-      height="350px" // Increased height
+      width="600px" // Width of the card
+      height="350px" // Height of the card
       borderRadius="20px" // Rounded corners
       overflow="hidden"
       onClick={() => setFlipped(!flipped)}
@@ -20,6 +20,11 @@ const Flashcard = ({ question, answer }) => {
       transition="transform 0.8s" // Longer transition for smoother flip
       transformStyle="preserve-3d"
       transform={flipped ? "rotateY(180deg)" : "rotateY(0deg)"}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      mx="auto" // Center the card horizontally
+      my="4" // Margin from the top and bottom
     >
       {/* Front Face */}
       <Box
@@ -30,14 +35,14 @@ const Flashcard = ({ question, answer }) => {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        p="6" // Increased padding
+        p="10" // Padding
         bg="rgba(185, 18, 60, 0.9)" // Red background for front
         color="white"
         zIndex={flipped ? 0 : 1}
         transition="opacity 0.4s"
         opacity={flipped ? 0 : 1} // Hide the front face during flip
       >
-        <Text fontSize="3xl" fontWeight="bold">{question}</Text> {/* Larger text */}
+        <Text fontSize="xl" fontWeight="bold" textAlign="center">{question}</Text> {/* Center text */}
       </Box>
       
       {/* Back Face */}
@@ -49,7 +54,7 @@ const Flashcard = ({ question, answer }) => {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        p="6" // Increased padding
+        p="10" // Padding
         bg="rgba(255, 255, 255, 0.9)" // White background for back
         color="black"
         transform="rotateY(180deg)"
@@ -57,7 +62,7 @@ const Flashcard = ({ question, answer }) => {
         transition="opacity 0.4s"
         opacity={flipped ? 1 : 0} // Show the back face when flipped
       >
-        <Text fontSize="xl" fontWeight="bold">{answer}</Text> {/* Larger text */}
+        <Text fontSize="xl" fontWeight="bold" textAlign="center">{answer}</Text> {/* Center text */}
       </Box>
     </Box>
   );

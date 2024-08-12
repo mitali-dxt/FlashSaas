@@ -12,7 +12,6 @@ const Dashboard = () => {
   const [flashcards, setFlashcards] = useState([]);
   const [categories, setCategories] = useState([]);
   const [originalCategoryId, setOriginalCategoryId] = useState(null);
-  const [view, setView] = useState('add'); // 'add' or 'create'
   const [editId, setEditId] = useState(null);
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
@@ -80,9 +79,8 @@ const Dashboard = () => {
       direction="column"
       alignItems="center"
       justifyContent="center"
-      p={8}
       bg="black"
-      minHeight="100vh"
+      minHeight="50vh"
       position="relative"
     >
       <Box
@@ -94,33 +92,22 @@ const Dashboard = () => {
         zIndex="1"
       >
         <Stack spacing={4} mb={8} align="center">
-          <Stack direction="row" spacing={4} mb={4}>
-            <Button
-              bg={view === 'add' ? 'rgb(190, 18, 60)' : 'white'}
-              color={view === 'add' ? 'white' : 'black'}
-              onClick={() => setView('add')}
-            >
-              Add Flashcard
-            </Button>
-            <Button
-              bg={view === 'create' ? 'rgb(190, 18, 60)' : 'white'}
-              color={view === 'create' ? 'white' : 'black'}
-              onClick={() => setView('create')}
-            >
-              Create Category
-            </Button>
-          </Stack>
+          <Text fontSize="2xl" color="white" mt={20} mb={10} textAlign="center" fontWeight="bold">
+            Add Flashcards and Categories
+          </Text>
 
-          {view === 'create' && (
-            <CreateCategory fetchCategories={fetchCategories} />
-          )}
+          <Flex direction="row" justify="space-between" mb={4}>
+            <Box flex="1" mr={4}>
+              <CreateCategory fetchCategories={fetchCategories} />
+            </Box>
+            <Box flex="1">
+              <AddFlashcard
+                fetchFlashcards={fetchFlashcards}
+                categories={categories}
+              />
+            </Box>
+          </Flex>
 
-          {view === 'add' && (
-            <AddFlashcard
-              fetchFlashcards={fetchFlashcards}
-              categories={categories}
-            />
-          )}
         </Stack>
 
         <Text fontSize="2xl" color="white" mt={20} mb={10} textAlign="center" fontWeight="bold">
@@ -211,7 +198,6 @@ const Dashboard = () => {
                       Delete
                     </Button>
                   </Stack>
-
                 </Box>
               ))}
             </Grid>
@@ -219,44 +205,43 @@ const Dashboard = () => {
         ))}
 
         {/* Edit Modal */}
-<Modal isOpen={isOpen} onClose={onClose} isCentered>
-  <ModalOverlay />
-  <ModalContent bg="black" color="white" border="1px solid" borderColor="grey">
-    <ModalHeader fontWeight="bold">Edit Flashcard</ModalHeader>
-    <ModalCloseButton color="white" />
-    <ModalBody>
-      <Stack spacing={4}>
-        <Input
-          placeholder="Edit Question"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          bg="gray.800"
-          borderColor="gray.600"
-          _placeholder={{ color: 'gray.400' }}
-          color="white"
-        />
-        <Textarea
-          placeholder="Edit Answer"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          bg="gray.800"
-          borderColor="gray.600"
-          _placeholder={{ color: 'gray.400' }}
-          color="white"
-        />
-      </Stack>
-    </ModalBody>
-
-    <ModalFooter>
-      <Button colorScheme="red" bg="rgb(190, 18, 60)" mr={3} onClick={handleEditFlashcard}>
-        Update
-      </Button>
-      <Button colorScheme="black"  bg="black" onClick={onClose}>Cancel</Button>
-    </ModalFooter>
-  </ModalContent>
-</Modal>
-
-
+        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+          <ModalOverlay />
+          <ModalContent bg="black" color="white" border="1px solid" borderColor="grey">
+            <ModalHeader fontWeight="bold">Edit Flashcard</ModalHeader>
+            <ModalCloseButton color="white" />
+            <ModalBody>
+              <Stack spacing={4}>
+                <Input
+                  placeholder="Edit Question"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  bg="gray.800"
+                  borderColor="gray.600"
+                  _placeholder={{ color: 'gray.400' }}
+                  color="white"
+                />
+                <Textarea
+                  placeholder="Edit Answer"
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  bg="gray.800"
+                  borderColor="gray.600"
+                  _placeholder={{ color: 'gray.400' }}
+                  color="white"
+                />
+              </Stack>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="red" mr={3} onClick={handleEditFlashcard}>
+                Save
+              </Button>
+              <Button colorScheme='black' onClick={onClose}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </Flex>
   );
