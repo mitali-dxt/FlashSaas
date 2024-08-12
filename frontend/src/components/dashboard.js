@@ -1,45 +1,79 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Button, Input, Stack, Text, Flex, Grid } from '@chakra-ui/react';
+import {
+  Box, Button, Flex, Grid, Stack, Text, Modal, ModalOverlay,
+  ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
+  Input, Textarea, useDisclosure
+} from '@chakra-ui/react';
+import AddFlashcard from './AddFlashcard';
+import CreateCategory from './CreateCategory';
 
 const Dashboard = () => {
   const [flashcards, setFlashcards] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [originalCategoryId, setOriginalCategoryId] = useState(null);
+  const [view, setView] = useState('add'); // 'add' or 'create'
+  const [editId, setEditId] = useState(null);
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const [editId, setEditId] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     fetchFlashcards();
+    fetchCategories();
   }, []);
 
   const fetchFlashcards = async () => {
-    const response = await axios.get('http://localhost:5000/flashcards');
-    setFlashcards(response.data);
-  };
-
-  const handleAddFlashcard = async () => {
-    if (question && answer) {
-      await axios.post('http://localhost:5000/flashcards', { question, answer });
-      setQuestion('');
-      setAnswer('');
-      fetchFlashcards();
+    try {
+      const response = await axios.get('http://localhost:5000/flashcards');
+      setFlashcards(response.data);
+    } catch (error) {
+      console.error('Error fetching flashcards:', error.message);
     }
   };
 
-  const handleEditFlashcard = async (id) => {
-    if (question && answer) {
-      await axios.put(`http://localhost:5000/flashcards/${id}`, { question, answer });
-      setQuestion('');
-      setAnswer('');
-      setEditId(null);
-      fetchFlashcards();
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error.message);
     }
   };
 
   const handleDeleteFlashcard = async (id) => {
-    await axios.delete(`http://localhost:5000/flashcards/${id}`);
-    fetchFlashcards();
+    try {
+      await axios.delete(`http://localhost:5000/flashcards/${id}`);
+      fetchFlashcards(); // Refresh the list after deletion
+    } catch (error) {
+      console.error('Error deleting flashcard:', error.message);
+    }
   };
+
+  const handleEditFlashcard = async () => {
+    try {
+      await axios.put(`http://localhost:5000/flashcards/${editId}`, {
+        question,
+        answer,
+        category_id: originalCategoryId,
+      });
+
+      fetchFlashcards(); // Refresh the list after updating
+      onClose(); // Close the modal
+    } catch (error) {
+      console.error('Error updating flashcard:', error.message);
+    }
+  };
+
+  const groupedFlashcards = flashcards.reduce((acc, flashcard) => {
+    const category = categories.find(cat => cat.id === flashcard.category_id);
+    const categoryName = category ? category.name : 'Uncategorized';
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+    acc[categoryName].push(flashcard);
+    return acc;
+  }, {});
 
   return (
     <Flex
@@ -51,127 +85,176 @@ const Dashboard = () => {
       minHeight="100vh"
       position="relative"
     >
-     
-
       <Box
         width={{ base: '100%', md: '80%', lg: '60%' }}
-        bg="transparent"
+        bg="black"
         p={6}
         borderRadius="md"
         boxShadow="lg"
         zIndex="1"
       >
         <Stack spacing={4} mb={8} align="center">
-          <Input 
-            color="white"
-            placeholder="Question"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            width="80%" // Set the width as needed
-            height="50px" // Set the height for the question input
-          />
-          <Input align="center"
-            color="white"
-            placeholder="Answer"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            width="80%" // Set the width as needed
-            height="100px" // Set the height for the answer textarea
-            resize="none" // Prevent resizing of the textarea
-
-          />
-          {editId ? (
-            <Button colorScheme="black" onClick={() => handleEditFlashcard(editId)} mt={4}>
-              Update Flashcard
-            </Button>
-          ) : (
-            <Button bg="rgb(190, 18, 60)" color="white" onClick={handleAddFlashcard} mt={4}>
+          <Stack direction="row" spacing={4} mb={4}>
+            <Button
+              bg={view === 'add' ? 'rgb(190, 18, 60)' : 'white'}
+              color={view === 'add' ? 'white' : 'black'}
+              onClick={() => setView('add')}
+            >
               Add Flashcard
             </Button>
+            <Button
+              bg={view === 'create' ? 'rgb(190, 18, 60)' : 'white'}
+              color={view === 'create' ? 'white' : 'black'}
+              onClick={() => setView('create')}
+            >
+              Create Category
+            </Button>
+          </Stack>
+
+          {view === 'create' && (
+            <CreateCategory fetchCategories={fetchCategories} />
+          )}
+
+          {view === 'add' && (
+            <AddFlashcard
+              fetchFlashcards={fetchFlashcards}
+              categories={categories}
+            />
           )}
         </Stack>
-         {/* Blurred Background Behind Grid */}
-      <Box
-        position="absolute"
-        top="70%"
-        left="50%"
-        transform="translate(-50%, -50%)"
-        width="500px"
-        height="500px"
-        borderRadius="30%"
-        bgGradient="linear(to-t, black, rgb(190, 18, 60))"
-        boxShadow="lg"
-        zIndex="0"
-        style={{
-          filter: 'blur(100px)',
-          opacity: 0.2,
-        }}
-      />
 
         <Text fontSize="2xl" color="white" mt={20} mb={10} textAlign="center" fontWeight="bold">
           Your Flashcards
         </Text>
 
-        <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={6}>
-  {flashcards.map((flashcard) => (
-    <Box
-      key={flashcard.id}
-      bg="rgba(255, 255, 255, 0.1)" // Slightly transparent white background for glassmorphism
-      p={6}
-      borderRadius="md"
-      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Light shadow for depth
-      backdropFilter="blur(10px)" // Blur effect for glassmorphism
-      border="1px solid rgba(255, 255, 255, 0.3)" // Border to enhance glassmorphism effect
-      _hover={{ boxShadow: 'xl', transform: 'scale(1.05)' }}
-      transition="all 0.2s"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="space-between" // Space between content and buttons
-      textAlign="center"
-      height="200px" // Set fixed height or adjust as needed
-      minHeight="200px"
-      overflowY="auto" // Enable vertical scrolling if content overflows
-    >
-      <Box flex="1"overflowY="auto" // Enable vertical scrolling
-        padding="2"
-        textOverflow="ellipsis"
-        wordBreak="break-word"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"> {/* Flex item to grow and shrink with the content */}
-        <Text fontWeight="bold" color="white" mb={2}>
-          {flashcard.question}
-        </Text>
-        <Text color="grey" mb={4}>
-          {flashcard.answer}
-        </Text>
-      </Box>
-      <Stack direction="row" spacing={2} mt={2} justifyContent="center">
-        <Button
-          size="sm"
-          colorScheme="green"
-          borderRadius="20px"
-          onClick={() => {
-            setQuestion(flashcard.question);
-            setAnswer(flashcard.answer);
-            setEditId(flashcard.id);
+        <Box
+          position="absolute"
+          top="70%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          width="500px"
+          height="500px"
+          borderRadius="30%"
+          bgGradient="linear(to-t, black, rgb(190, 18, 60))"
+          boxShadow="lg"
+          zIndex="0"
+          style={{
+            filter: 'blur(100px)',
+            opacity: 0.2,
           }}
-        >
-          Edit
-        </Button>
-        <Button
-          size="sm"
-          colorScheme="red"
-          borderRadius="20px"
-          onClick={() => handleDeleteFlashcard(flashcard.id)}
-        >
-          Delete
-        </Button>
+        />
+        {Object.keys(groupedFlashcards).map((categoryName) => (
+          <Box key={categoryName} mb={12}>
+            <Text fontSize="xl" color="white" mb={4} fontWeight="bold">
+              {categoryName}
+            </Text>
+            <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={6}>
+              {groupedFlashcards[categoryName].map((flashcard) => (
+                <Box
+                  key={flashcard.id}
+                  bg="rgba(255, 255, 255, 0.1)"
+                  p={6}
+                  borderRadius="md"
+                  boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+                  backdropFilter="blur(10px)"
+                  border="1px solid rgba(255, 255, 255, 0.3)"
+                  _hover={{ boxShadow: 'xl', transform: 'scale(1.05)' }}
+                  transition="all 0.2s"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  textAlign="center"
+                  height="200px"
+                  minHeight="200px"
+                  overflowY="auto"
+                >
+                  <Box
+                    flex="1"
+                    overflowY="auto"
+                    padding="2"
+                    textOverflow="ellipsis"
+                    wordBreak="break-word"
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                  >
+                    <Text fontWeight="bold" color="white" mb={2}>
+                      {flashcard.question}
+                    </Text>
+                    <Text color="grey" mb={4}>
+                      {flashcard.answer}
+                    </Text>
+                  </Box>
+
+                  <Stack direction="row" spacing={2} mt={2} justifyContent="center">
+                    <Button
+                      size="sm"
+                      colorScheme="green"
+                      borderRadius="20px"
+                      onClick={() => {
+                        setQuestion(flashcard.question);
+                        setAnswer(flashcard.answer);
+                        setEditId(flashcard.id);
+                        setOriginalCategoryId(flashcard.category_id);
+                        onOpen(); // Open the modal
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme="red"
+                      borderRadius="20px"
+                      onClick={() => handleDeleteFlashcard(flashcard.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Stack>
+
+                </Box>
+              ))}
+            </Grid>
+          </Box>
+        ))}
+
+        {/* Edit Modal */}
+<Modal isOpen={isOpen} onClose={onClose} isCentered>
+  <ModalOverlay />
+  <ModalContent bg="black" color="white" border="1px solid" borderColor="grey">
+    <ModalHeader fontWeight="bold">Edit Flashcard</ModalHeader>
+    <ModalCloseButton color="white" />
+    <ModalBody>
+      <Stack spacing={4}>
+        <Input
+          placeholder="Edit Question"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          bg="gray.800"
+          borderColor="gray.600"
+          _placeholder={{ color: 'gray.400' }}
+          color="white"
+        />
+        <Textarea
+          placeholder="Edit Answer"
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          bg="gray.800"
+          borderColor="gray.600"
+          _placeholder={{ color: 'gray.400' }}
+          color="white"
+        />
       </Stack>
-    </Box>
-  ))}
-</Grid>
+    </ModalBody>
+
+    <ModalFooter>
+      <Button colorScheme="red" bg="rgb(190, 18, 60)" mr={3} onClick={handleEditFlashcard}>
+        Update
+      </Button>
+      <Button colorScheme="black"  bg="black" onClick={onClose}>Cancel</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
 
 
       </Box>
