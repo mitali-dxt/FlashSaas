@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Flex, IconButton } from '@chakra-ui/react';
 import Flashcard from './flashcard';
-import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons'; // Import the icons
-
-const flashcards = [
-  { question: 'What is React?', answer: 'A JavaScript library for building user interfaces.' },
-  { question: 'What is JSX?', answer: 'A syntax extension for JavaScript that looks similar to XML.' },
-  // Add more flashcards here
-];
+import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
+import axios from 'axios'; 
 
 const FlashcardDeck = () => {
+  const [flashcards, setFlashcards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    fetchFlashcards();
+  }, []);
+
+  const fetchFlashcards = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/flashcards');
+      setFlashcards(response.data);
+    } catch (error) {
+      console.error('Error fetching flashcards:', error);
+    }
+  };
 
   const nextCard = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % flashcards.length);
@@ -39,9 +48,9 @@ const FlashcardDeck = () => {
         boxShadow="lg"
         zIndex="0" // Ensure it is behind other content
         style={{
-            filter: 'blur(70px)', // Apply blur effect
-            opacity: 0.2, // Adjust opacity for the glass effect
-          }}
+          filter: 'blur(70px)', // Apply blur effect
+          opacity: 0.2, // Adjust opacity for the glass effect
+        }}
       />
       <Flex
         direction="column"
@@ -70,10 +79,12 @@ const FlashcardDeck = () => {
             _focus={{ boxShadow: "none" }}
           />
           <Box>
-            <Flashcard
-              question={flashcards[currentIndex].question}
-              answer={flashcards[currentIndex].answer}
-            />
+            {flashcards.length > 0 && (
+              <Flashcard
+                question={flashcards[currentIndex].question}
+                answer={flashcards[currentIndex].answer}
+              />
+            )}
           </Box>
           <IconButton
             aria-label="Next"
