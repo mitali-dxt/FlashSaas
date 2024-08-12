@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Button, Flex, HStack, Image, Spacer } from "@chakra-ui/react";
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
@@ -14,6 +15,19 @@ const Navbar = () => {
             height="100px"
           />
         </Box>
+
+        {/* Dashboard Link */}
+        <Link to="/dashboard">
+          <Button
+            variant="link"
+            color="white"
+            fontSize="lg"
+            fontWeight="bold"
+            ml="30px"
+          >
+            Dashboard
+          </Button>
+        </Link>
 
         <Spacer />
 
