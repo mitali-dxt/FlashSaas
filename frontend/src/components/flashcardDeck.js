@@ -55,7 +55,7 @@ const FlashcardDeck = () => {
         <Flex align="center" position="relative">
           <IconButton
             aria-label="Previous"
-            icon={<ArrowBackIcon />}
+            icon={<ArrowBackIcon boxSize={8}/>}
             onClick={prevCard}
             position="absolute"
             left="16px" // Adjusted position
@@ -77,7 +77,7 @@ const FlashcardDeck = () => {
           </Box>
           <IconButton
             aria-label="Next"
-            icon={<ArrowForwardIcon />}
+            icon={<ArrowForwardIcon boxSize={8} />}
             onClick={nextCard}
             position="absolute"
             right="16px" // Adjusted position
